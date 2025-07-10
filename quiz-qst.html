@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Time</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fonts {
+            font-family: Arial, sans-serif;
+        }
+
+        @keyframes confetti {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti 5s ease-out forwards;
+            z-index: 1000;
+        }
+
+        /* Style du bouton identique à votre bouton Start the Game */
+        .home-button {
+            position: relative;
+            display: inline-block;
+            padding: 14px 28px;
+            margin-top: 2rem;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            color: white;
+            text-decoration: none;
+            overflow: hidden;
+            border: 2px solid #ffffff;
+            transition: all 1s ease;
+            z-index: 10;
+            background-color: #172554;
+            text-shadow:
+                0 0 10px #38bdf8,
+                0 0 20px #38bdf8,
+                0 0 30px #0ea5e9;
+            box-shadow:
+                0 0 10px #38bdf8,
+                0 0 20px #0ea5e9,
+                0 0 30px #0284c7;
+            cursor: pointer;
+        }
+
+        .home-button::after {
+            content: "";
+            position: absolute;
+            height: 0%;
+            left: 50%;
+            top: 50%;
+            width: 150%;
+            background: #0284c7;
+            z-index: -1;
+            transform: translateX(-50%) translateY(-50%) rotate(-25deg);
+            transition: all 0.75s ease;
+        }
+
+        .home-button:hover {
+            color: white;
+        }
+
+        .home-button:hover::after {
+            height: 450%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen w-full bg-blue-950 flex justify-center items-center">
+
+    <!-- Container Principal -->
+    <div
+        class="w-[500px] h-[480px] rounded-xl bg-gradient-to-b from-white to-blue-100 relative overflow-visible flex items-center flex-col px-6 py-4 shadow-2xl shadow-[0_0_10px_#38bdf8,0_0_20px_#0ea5e9,0_0_30px_#0284c7]">
+
+        <!-- Image Haut Gauche -->
+        <div
+            class="absolute -top-7 -left-4 w-[70px] h-[70px] bg-[url('speaker.png')] bg-contain bg-no-repeat bg-center z-10">
+        </div>
+
+        <!-- Image Haut Droite -->
+        <div
+            class="absolute -top-11 -right-4 w-[100px] h-[100px] bg-[url('question-and-answer.png')] bg-contain bg-no-repeat bg-center z-10">
+        </div>
+
+        <!-- Titre -->
+        <h1 class="mt-8 font-bold fonts text-[36px] sm:text-[40px] uppercase text-blue-950">quiz time</h1>
+
+        <!-- Question -->
+        <div id="answers">
+            <!-- Réponses -->
+        </div>
+
+        <!-- Bouton Suivant -->
+        <div onclick="next()"
+            class="absolute bottom-0 right-0 mb-[10px] mr-[10px] w-[50px] h-[50px] bg-[url('next-button.png')] bg-contain bg-no-repeat bg-center z-10 cursor-pointer hover:scale-110 transition-transform duration-300">
+        </div>
+
+        <!-- Bouton Retour (caché par défaut) -->
+        <div id="homeButton" class="home-button hidden" onclick="goHome()">Restart the game</div>
+    </div>
+</body>
+
+<script>
+    let quiz = [
+        {
+            qst: "Which country is known as the 'Land of the Rising Sun'?",
+            opt1: "China",
+            opt2: "Japan",
+            opt3: "South korea",
+            opt4: "Thailand",
+            rsp: "Japan"
+        },
+        {
+            qst: "Which planet is known as the Red Planet?",
+            opt1: "Venus",
+            opt2: "Saturn",
+            opt3: "Mars",
+            opt4: "Jupiter",
+            rsp: "Mars"
+        },
+        {
+            qst: "What is the largest ocean on Earth?",
+            opt1: "Atlantic Ocean",
+            opt2: "Pacific Ocean",
+            opt3: "Indian Ocean",
+            opt4: "Arctic Ocean",
+            rsp: "Pacific Ocean"
+        },
+        {
+            qst: "What is the second longest river in the world?",
+            opt1: "Amazon River",
+            opt2: "Yangtze River",
+            opt3: "Mississippi River",
+            opt4: "Nile River",
+            rsp: "Amazon River"
+        },
+        {
+            qst: "What is the smallest country in the world by land area?",
+            opt1: "San Marino",
+            opt2: "Monaco",
+            opt3: "Vatican City",
+            opt4: "Liechtenstein",
+            rsp: "Vatican City"
+        },
+        {
+            qst: "What language has the most native speakers worldwide?",
+            opt1: "English",
+            opt2: "Hindi",
+            opt3: "Spanish",
+            opt4: "Mandarin Chinese",
+            rsp: "Mandarin Chinese"
+        },
+        {
+            qst: "What is the capital city of New Zealand?",
+            opt1: "Auckland",
+            opt2: "Wellington",
+            opt3: "Christchurch",
+            opt4: "Hamilton",
+            rsp: "Wellington"
+        },
+        {
+            qst: "How many bones are there in the adult human body?",
+            opt1: "206",
+            opt2: "201",
+            opt3: "208",
+            opt4: "212",
+            rsp: "206"
+        },
+        {
+            qst: "Who wrote the play 'Romeo and Juliet'?",
+            opt1: "Oscar Wilde",
+            opt2: "William Shakespeare",
+            opt3: "Charles Dickens",
+            opt4: "Jane Austen",
+            rsp: "William Shakespeare"
+        },
+        {
+            qst: "What is the currency of South Korea?",
+            opt1: "Won",
+            opt2: "Yen",
+            opt3: "Ruble",
+            opt4: "Ringgit",
+            rsp: "Won"
+        }
+    ]
+
+    let coorect = 0
+    let index = 0;
+    let confettiInterval = null;
+
+    function display() {
+        let q = quiz[index];
+        if (index >= quiz.length) {
+            showResult()
+            return;
+        }
+
+        // Cacher le bouton home s'il est visible
+        document.getElementById('homeButton').classList.add('hidden');
+
+        let answers = document.getElementById("answers")
+        answers.innerHTML =
+            `
+    <p class="mt-4 text-center text-lg text-blue-900 font-medium">${q.qst}</p>
+    <div class="space-y-4 mt-6 w-full flex flex-col items-center">
+                <!-- Choix A -->
+                <div onclick="choose('${q.opt1}')"
+                     class="relative h-[50px] w-[250px] bg-blue-800 rounded-xl pl-[70px] pt-[12px] text-white font-semibold transition duration-700 hover:shadow-[0_0_10px_#38bdf8,0_0_20px_#0ea5e9,0_0_30px_#0284c7] cursor-pointer">
+                    <div id="opt1"  
+                        class="absolute top-1/2 left-4 -translate-y-1/2 w-[30px] h-[30px] rounded-full bg-white text-blue-800 flex items-center justify-center font-bold shadow-md">
+                        A</div>
+                   ${q.opt1} 
+                </div>
+
+                <!-- Choix B -->
+                <div onclick="choose('${q.opt2}')"
+                    class="relative h-[50px] w-[250px] bg-blue-800 rounded-xl pl-[70px] pt-[12px] text-white font-semibold transition duration-700 hover:shadow-[0_0_10px_#38bdf8,0_0_20px_#0ea5e9,0_0_30px_#0284c7] cursor-pointer">
+                    <div id="opt2"
+                      
+                        class="absolute top-1/2 left-4 -translate-y-1/2 w-[30px] h-[30px] rounded-full bg-white text-blue-800 flex items-center justify-center font-bold shadow-md">
+                        B</div>
+                    ${q.opt2} 
+                </div>
+
+                <!-- Choix C -->
+                <div onclick="choose('${q.opt3}')"
+                    class="relative h-[50px] w-[250px] bg-blue-800 rounded-xl pl-[70px] pt-[12px] text-white font-semibold transition duration-700 hover:shadow-[0_0_10px_#38bdf8,0_0_20px_#0ea5e9,0_0_30px_#0284c7] cursor-pointer">
+                    <div id="opt3"  
+                        class="absolute top-1/2 left-4 -translate-y-1/2 w-[30px] h-[30px] rounded-full bg-white text-blue-800 flex items-center justify-center font-bold shadow-md">
+                        C</div>
+                    ${q.opt3} 
+                </div>
+
+                <!-- Choix D -->
+                <div onclick="choose('${q.opt4}')"
+                    class="relative h-[50px] w-[250px] bg-blue-800 rounded-xl pl-[70px] pt-[12px] text-white font-semibold transition duration-700 hover:shadow-[0_0_10px_#38bdf8,0_0_20px_#0ea5e9,0_0_30px_#0284c7] cursor-pointer">
+                    <div id="opt4" 
+                        class="absolute top-1/2 left-4 -translate-y-1/2 w-[30px] h-[30px] rounded-full bg-white text-blue-800 flex items-center justify-center font-bold shadow-md">
+                        D</div>
+                   ${q.opt4} 
+                </div>
+    `
+    }
+
+    function createConfetti() {
+        const colors = ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#a78bfa', '#f472b6'];
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = Math.random() * 10 + 5 + 'px';
+        document.body.appendChild(confetti);
+
+        setTimeout(() => {
+            confetti.remove();
+        }, 5000);
+    }
+
+    function startInfiniteConfetti() {
+        // Clear any existing interval
+        if (confettiInterval) {
+            clearInterval(confettiInterval);
+        }
+        // Start new infinite confetti
+        confettiInterval = setInterval(createConfetti, 100);
+    }
+
+    function showResult() {
+        const total = quiz.length;
+        const percent = Math.round((coorect / total) * 100);
+        const color = percent < 50 ? "#ef4444" : percent === 100 ? "#16a34a" : "#4ade80";
+        const message = percent === 100
+            ? "🎉 Congratulations! All answers are correct!"
+            : `You got ${coorect} out of ${total} correct.`;
+
+        document.getElementById("answers").innerHTML = `
+    <p class="text-xl text-center font-bold text-blue-900 mb-6">${message}</p>
+    <div class="flex justify-center items-center">
+      <svg class="w-40 h-40" viewBox="0 0 160 160">
+        <circle class="text-gray-300" stroke-width="10" stroke="currentColor" fill="transparent" r="60" cx="80" cy="80" transform="rotate(-90 80 80)" />
+        <circle id="circle" stroke-width="10" stroke-dasharray="377" stroke-dashoffset="377"
+          stroke-linecap="round" stroke="${color}" fill="transparent" r="60" cx="80" cy="80" transform="rotate(-90 80 80)" />
+        <text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="20" class="fill-blue-900 font-bold">${percent}%</text>
+      </svg>
+    </div>
+    `;
+
+        // Afficher le bouton home
+        document.getElementById('homeButton').classList.remove('hidden');
+
+        // Cacher le bouton suivant
+        document.querySelector('[onclick="next()"]').style.display = 'none';
+
+        animateCircle(percent);
+
+        if (percent === 100) {
+            startInfiniteConfetti();
+        } else if (confettiInterval) {
+            clearInterval(confettiInterval);
+            confettiInterval = null;
+        }
+    }
+
+    function animateCircle(percent) {
+        const circle = document.getElementById("circle");
+        const radius = 60;
+        const totalLength = 2 * Math.PI * radius;
+        const targetOffset = totalLength - (percent / 100) * totalLength;
+
+        let currentOffset = totalLength;
+        const step = (totalLength - targetOffset) / 60;
+
+        function animate() {
+            if (currentOffset > targetOffset) {
+                currentOffset -= step;
+                circle.setAttribute("stroke-dashoffset", currentOffset);
+                requestAnimationFrame(animate);
+            } else {
+                circle.setAttribute("stroke-dashoffset", targetOffset);
+            }
+        }
+
+        animate();
+    }
+
+    function next() {
+        index++;
+        display();
+    }
+
+    function goHome() {
+        window.location.href = "js.html";
+    }
+
+    display();
+
+    let p = ["opt1", "opt2", "opt3", "opt4"]
+    let q = quiz[index];
+    function choose(selected) {
+        let q = quiz[index];
+        let p = ["opt1", "opt2", "opt3", "opt4"];
+        let options = [q.opt1, q.opt2, q.opt3, q.opt4];
+
+        for (let i = 0; i < p.length; i++) {
+            let elem = document.getElementById(p[i]).parentElement;
+
+            if (options[i] === q.rsp) {
+                elem.classList.add('bg-green-600', 'text-white');
+            } else {
+                elem.classList.add('bg-red-600', 'text-white');
+            }
+
+            // Désactiver le clic sur toutes les options après le choix
+            elem.onclick = null;
+        }
+
+        if (selected === q.rsp) {
+            coorect++;
+        }
+    }
+</script>
+
+</html>
